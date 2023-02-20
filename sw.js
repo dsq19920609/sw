@@ -1,20 +1,12 @@
-// self.addEventListener("install", (event) => {
-//   let CACHE_NAME = "dsq-cache";
-//   let urlsToCache = ["/src/style.css", "/src/common.css", "/src/main.js"];
-//   event.waitUntil(
-//     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
-//   );
-// });
-
 const CACHE_PREFIX = "dsq-cache";
 const CACHE_VERSION = "0.0.3";
 const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
 
 const urlsToCache = [
-  "index.html",
-  "/src/style.css",
-  "/src/common.css",
-  "/src/main.js",
+  "./index.html",
+  "./src/style.css",
+  "./src/common.css",
+  "./src/main.js",
 ];
 
 self.addEventListener("install", (event) => {
