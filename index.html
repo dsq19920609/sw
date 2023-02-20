@@ -22,7 +22,7 @@
         // 页面加载完成后 注册serviceworker
         window.addEventListener("load", () => {
           window.navigator.serviceWorker
-            .register("sw.js", { scope: "/" })
+            .register("sw.js", { scope: "/sw/" })
             .then(() => {
               console.log("注册成功");
             })
