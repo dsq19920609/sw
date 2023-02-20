@@ -1,28 +1,59 @@
-/***
- * 初始化安装
- */
-self.addEventListener('install', () => {
-  // 1、优先缓存 js/css/html  2、在缓存 图片、字体、媒体
+// self.addEventListener("install", (event) => {
+//   let CACHE_NAME = "dsq-cache";
+//   let urlsToCache = ["/src/style.css", "/src/common.css", "/src/main.js"];
+//   event.waitUntil(
+//     caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+//   );
+// });
+
+const CACHE_PREFIX = "dsq-cache";
+const CACHE_VERSION = "0.0.3";
+const CACHE_NAME = `${CACHE_PREFIX}-${CACHE_VERSION}`;
+
+const urlsToCache = [
+  "index.html",
+  "/src/style.css",
+  "/src/common.css",
+  "/src/main.js",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+  );
 });
 
-/**
- * 激活生效
- */
-self.addEventListener('activate', () => {
-
+// 清除之前旧的缓存
+self.addEventListener("activate", (event) => {
+  const whiteList = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (whiteList.indexOf(cacheName) === -1) {
+            caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
 });
 
-/**
- * 拦截、缓存、
- */
-self.addEventListener('fetch', () => {
-
-});
-
-/**
- * 通信：页面和sw通过postMessage和监听message来通信
- * 缓存管理
- */
-self.addEventListener('message', () => {
-
+// 拦截请求
+self.addEventListener("fetch", (event) => {
+  const urlObj = new URL(event.request.url);
+  if (urlsToCache.includes(urlObj.pathname)) {
+    console.log("ff", urlObj.pathname);
+    event.respondWith(
+      (async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(event.request);
+        if (cachedResponse) {
+          // event.waitUntil(cache.add(event.request));
+          return cachedResponse;
+        }
+        return fetch(event.request);
+      })()
+    );
+  }
 });
